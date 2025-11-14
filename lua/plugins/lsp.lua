@@ -1,0 +1,24 @@
+return {
+  "neovim/nvim-lspconfig",
+  opts = {
+    servers = {
+      clangd = {},
+      ocamllsp = {},
+      pylsp = {}
+    }
+  },
+  config = function(_, opts)
+    local lspconfig = require("lspconfig")
+    local on_attach = function(client, bufnr)
+      local opts = { buffer = bufnr }
+      vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
+      vim.keymap.set("n", "<leader>cr", vim.lsp.buf.rename, opts)
+    end
+    for server, config in pairs(opts.servers) do
+      config.on_attach = on_attach
+      config.capabilities = require("blink.cmp").get_lsp_capabilities(config.capabilities)
+      vim.lsp.config(server, config)
+      vim.lsp.enable(server)
+    end
+  end
+}
